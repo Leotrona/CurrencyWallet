@@ -1,7 +1,13 @@
 import com.google.gson.Gson;
 
-import java.io.*;
-import java.net.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
+import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -13,7 +19,7 @@ import java.nio.channels.SocketChannel;
 import java.nio.file.Files;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
+
 
 public class CryptoCurrencyServer {
 
@@ -412,7 +418,7 @@ public class CryptoCurrencyServer {
 
     private void writeUserInfoToFile(String username, String password) {
         String toBeInput = username + " " + password;
-        try (var bufferedWriter =new FileWriter(users,true)) {
+        try (var bufferedWriter = new FileWriter(users,true)) {
             bufferedWriter.write(toBeInput);
             bufferedWriter.flush();
             bufferedWriter.write(System.lineSeparator());
