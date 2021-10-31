@@ -6,14 +6,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.net.SocketAddress;
 import java.net.http.HttpClient;
-import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.nio.file.Files;
-import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class RequestHandler {
 
@@ -24,6 +19,7 @@ public class RequestHandler {
     private static Map<SocketAddress, Boolean> threadsLoggedIn = new HashMap<>();
     private static Map<String, Wallet> usernameWallet = new HashMap<>();
     private static Map<SocketAddress, String> currentUserOnThread = new HashMap<>();
+    private static List<String> loggedInUsers = new ArrayList<>();
     private static final Gson GSON = new Gson();
 
 
@@ -104,6 +100,7 @@ public class RequestHandler {
         currentUserOnThread.put(socketChannel.getRemoteAddress(), username);
         usernameWallet.put(username, new Wallet());
         writeWalletsToFile();
+        loggedInUsers.add(username);
         return "Successfully registered " + username + "!";
     }
 
@@ -120,6 +117,8 @@ public class RequestHandler {
 
         if (!checkFileForUsername(username)) {
             return "No such username!";
+        } else if (loggedInUsers.contains(username)) {
+            return "You are already logged in !";
         }
 
         try (BufferedReader bufferedReader = Files.newBufferedReader(users.toPath())) {
@@ -132,6 +131,7 @@ public class RequestHandler {
             }
             threadsLoggedIn.put(socketChannel.getRemoteAddress(), true);
             currentUserOnThread.put(socketChannel.getRemoteAddress(), username);
+            loggedInUsers.add(username);
             return "Successful login " + username + "!";
 
         } catch (IOException e) {
@@ -294,7 +294,9 @@ public class RequestHandler {
         }
 
         threadsLoggedIn.put(socketChannel.getRemoteAddress(), false);
+        String username = currentUserOnThread.get(socketChannel.getRemoteAddress());
         currentUserOnThread.put(socketChannel.getRemoteAddress(), null);
+        loggedInUsers.remove(username);
         return "Successfully logged out!";
     }
 
