@@ -10,6 +10,7 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.nio.file.Files;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -125,7 +126,7 @@ public class RequestHandler {
             String line;
 
             while((line = bufferedReader.readLine()) != null) {
-                if(line.contains(username) && !line.contains(password)) {
+                if(line.contains(username) && !line.contains(encryptPassword(password))) {
                     return "Incorrect password!";
                 }
             }
@@ -315,6 +316,7 @@ public class RequestHandler {
     }
 
     private static void writeUserInfoToFile(String username, String password) {
+        password = encryptPassword(password);
         String toBeInput = username + " " + password;
         try (var bufferedWriter = new FileWriter(users,true)) {
             bufferedWriter.write(toBeInput);
@@ -355,6 +357,16 @@ public class RequestHandler {
         }
     }
 
-
+    private static String encryptPassword(String password) {
+        char[] passAsChar = password.toCharArray();
+        for(int i = 0; i < passAsChar.length; i++) {
+            passAsChar[i] += 5;
+        }
+        String newPassword = String.valueOf(passAsChar);
+        StringBuilder sb = new StringBuilder(newPassword);
+        sb.reverse();
+        newPassword = sb.toString();
+        return newPassword;
+    }
 
 }

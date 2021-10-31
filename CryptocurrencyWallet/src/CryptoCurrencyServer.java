@@ -20,7 +20,7 @@ public class CryptoCurrencyServer {
     private static final int BUFFER_SIZE = 4096;
     private static final String SERVER_HOST = "localhost";
 
-    private RequestHandler handler = new RequestHandler();
+    private RequestHandler requestHandler;
 
     private final int port;
     private final ByteBuffer messageBuffer;
@@ -28,6 +28,7 @@ public class CryptoCurrencyServer {
 
 
     public CryptoCurrencyServer (int port) throws IOException {
+        requestHandler = new RequestHandler();
         this.port = port;
         this.messageBuffer = ByteBuffer.allocate(BUFFER_SIZE);
 
@@ -99,7 +100,7 @@ public class CryptoCurrencyServer {
         System.out.println("Message [ " + message + " ] received from client " + socketChannel.getRemoteAddress());
 
         String response = null;
-        response = handler.handleRequest(message, socketChannel);
+        response = requestHandler.handleRequest(message, socketChannel);
 
 
         if (response != null) {
